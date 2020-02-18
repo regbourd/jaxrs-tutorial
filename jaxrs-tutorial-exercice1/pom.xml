@@ -51,6 +51,15 @@
 			<artifactId>istack-commons-runtime</artifactId>
 			<version>${istack.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>${jaxrs.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>
