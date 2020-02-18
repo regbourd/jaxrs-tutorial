@@ -2,6 +2,8 @@ package fr.mickaelbaron.jaxrstutorialexercice2;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author Mickael BARON (baron.mickael@gmail.com)
  */
@@ -9,9 +11,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class TrainBooking {
 
 	private String id;
-
+	
+	@JsonProperty("current_train")
 	private String trainId;
-
+	
+	@JsonProperty("number_places")
 	private int numberPlaces;
 
 	public String getId() {
