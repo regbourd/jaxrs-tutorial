@@ -11,13 +11,36 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * @author Mickael BARON (baron.mickael@gmail.com)
  */
-public class TrainResourceIntegrationTest {
+public class TrainResourceIntegrationTest extends JerseyTest{
+    
+    @Override
+    protected Application configure() {
+        ResourceConfig resourceConfig = new ResourceConfig(TrainResource.class);
+        resourceConfig.property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL_SERVER, Level.WARNING.getName());
+        return resourceConfig;
+    }
+    
+    @Test
+    public void getTrainsTest() {
+        // Given
+
+        // When
+        Response response = target("/trains").request(MediaType.APPLICATION_JSON_TYPE).get();
+
+        // Then
+        Assert.assertEquals("Http Response should be 200: ", Status.OK.getStatusCode(), response.getStatus());
+        List<Train> readEntities = response.readEntity(new GenericType<List<Train>>() {});
+        Assert.assertNotNull(readEntities);
+        Assert.assertEquals(3, readEntities.size());
+        Assert.assertTrue(readEntities.stream().anyMatch(current -> "TR123".equals(current.getId())));
+    }
 
 	@Test
 	public void getTrainTest() {
@@ -25,8 +48,7 @@ public class TrainResourceIntegrationTest {
 		String trainId = "TR123";
 
 		// When
-		// TODO: invoquer le service dédié à la récupération d'un train
-		// par son identifiant fonctionnel (trainid = "TR123").
+		Response response = target("/trains").path("trainid-" + trainId).request(MediaType.APPLICATION_JSON_TYPE).get();
 
 		// Then
 		Assert.assertEquals("Http Response should be 200: ", Status.OK.getStatusCode(), response.getStatus());
@@ -47,12 +69,15 @@ public class TrainResourceIntegrationTest {
 		Response response = target("/trains").path("search").queryParam("departure", departure)
 				.queryParam("arrival", arrival).queryParam("departure_time", departureTime)
 				.request(MediaType.APPLICATION_JSON_TYPE).get();
-
+		
+		List<Train> readEntities = response.readEntity(new GenericType<List<Train>>() {});
         // Then
+		    
         // TODO: assertions à respecter ?
-        //  * le code de statut doit être `200` ;
-        //  * la réponse doit contenir trois paramètres d'en-tête qui correspondent 
-        //    aux paramètres de la requête initiale (`departure`, `arrival` et `departure_time`) ;
-        //  * le contenu doit être une liste de trains d'une taille de deux éléments.
+		    Assert.assertEquals("Http Response should be 200: ", Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(departure, response.getHeaderString("departure"));
+        Assert.assertEquals(arrival, response.getHeaderString("arrival"));
+        Assert.assertEquals(departureTime, response.getHeaderString("departure_time"));
+        Assert.assertEquals(2, readEntities.size());        
 	}
 }
