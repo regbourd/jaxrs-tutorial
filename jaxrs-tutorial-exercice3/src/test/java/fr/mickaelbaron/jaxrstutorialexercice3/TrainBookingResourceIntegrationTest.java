@@ -23,7 +23,7 @@ public class TrainBookingResourceIntegrationTest extends JerseyTest{
     
     @Override
     protected Application configure() {
-        ResourceConfig resourceConfig = new ResourceConfig(TrainBookingResource.class);
+        ResourceConfig resourceConfig = new ResourceConfig(TrainResource.class);
         resourceConfig.property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL_SERVER, Level.WARNING.getName());
         return resourceConfig;
     }
