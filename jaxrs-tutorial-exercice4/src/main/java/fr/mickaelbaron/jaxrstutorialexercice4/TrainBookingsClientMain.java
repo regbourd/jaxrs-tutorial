@@ -4,13 +4,20 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 /**
@@ -34,14 +41,17 @@ public class TrainBookingsClientMain extends JFrame {
 	}
 
 	private void initializeService() {
+	    Client client = ClientBuilder.newClient();
+      target = client.target("http://localhost:9993/api/trains");
 	}
 
 	private void callGetTrains() {
 		// TODO: invoquer le service web REST pour récupérer l'ensemble des trains
         // disponibles. Le résultat doit être transmis dans un objet de type
         // List<Train>.
-
-		trainsConsole.setText("");
+	  List<Train> result = target.request(MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<Train>>() {});
+	  
+ 		trainsConsole.setText("");
 		for (Train current : result) {
 			trainsConsole.append(current.getId() + " - " + current.getDeparture() + " - " + current.getArrival() + " - "
 					+ current.getDepartureTime() + "\n");
@@ -50,9 +60,14 @@ public class TrainBookingsClientMain extends JFrame {
 
 	private void createTrainBooking(String numTrain, int numberPlaces) {
         // TODO: créer un objet de type TrainBooking.
+	    TrainBooking trainBooking = new TrainBooking();
+	    trainBooking.setTrainId(numTrain);
+	    trainBooking.setNumberPlaces(numberPlaces);
 
         // TODO: invoquer le service web REST pour créer une réservation de train
 		// à partir de l'objet TrainBooking.
+	    
+	    Response post = target.path("bookings").request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(trainBooking));
 
 		if (Status.OK.getStatusCode() == post.getStatus()) {
 			System.out.println(post.readEntity(TrainBooking.class).getId());
@@ -63,7 +78,8 @@ public class TrainBookingsClientMain extends JFrame {
         // TODO: invoquer le service web REST pour récupérer l'ensemble des réservations
         // de billet de train.
         // Le résultat doit être transmis dans un objet de type List<TrainBooking>
-
+	    
+	    List<TrainBooking>  result =  target.path("bookings").request(MediaType.APPLICATION_JSON_TYPE).get(new GenericType<List<TrainBooking>>() {});
 		for (TrainBooking current : result) {
 			trainBookingsConsole.append(current.getId() + " - " + current.getTrainId() + " - " + current.getNumberPlaces());
 		}
